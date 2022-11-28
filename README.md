@@ -1,2 +1,6 @@
-# java-kanban
-Repository for homework project.
+<h1 align="center">Привет! Меня зовут Никита<img src="https://media.tenor.com/SNL9_xhZl9oAAAAi/waving-hand-joypixels.gif" height=50 width=50/></img></h1>
+<h3 align="center">Я студент из России на курсе "Java-Разработчик"</h3>
+
+<div align="left"> Представляю Вашему вниманию проект "Трекер задач".
+Он позволяет создавать задачи и эпики (список подзадач), обновлять их и удалять.
+На данный момент это начальная версия, которая по мере моего обучения будет претерпевать изменения :) </div>

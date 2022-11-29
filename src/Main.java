@@ -18,34 +18,29 @@ public class Main {
         manager.create(task2);
         System.out.println(manager.getAll());
 
-        //Очистка трекера задач
-        /*manager.delAll();
-        System.out.println(manager.getAll());*/
+        System.out.println("Получение задачи по id: " + 5);
+        System.out.println(manager.getById(5));
+        System.out.println();
 
-        //Получение задачи по id
-        /*manager.getById(5);
-        System.out.println(manager.getById(5));*/
+        System.out.println("Получение списка всех подзадач определённого эпика: " + 2);
+        System.out.println(manager.getSubTaskList(epic2));
+        System.out.println();
 
-        //Удаление задачи по id
-        /*manager.delById(3);
-        System.out.println(manager.getAll());*/
-
-        //Получение списка всех подзадач определённого эпика
-        /*manager.getSubTaskList(epic2);
-        System.out.println(manager.getSubTaskList(epic2));*/
-
-        //Обновление задачи TASK
-        /*task1.description = "Помыть щётку";
+        System.out.println("Обновление задачи TASK");
+        task1.description = "Помыть щётку";
         manager.updateTask(task1);
         System.out.println(manager.getAll());
         task1.description = "Убрать щётку";
         task2.description = "Помыть бритву";
         manager.updateTask(task1);
         manager.updateTask(task2);
-        System.out.println(manager.getAll());*/
+        System.out.println(manager.getAll());
+        manager.updateTask(task2);
+        System.out.println(manager.getAll());
+        System.out.println();
 
-        //Обновление EPIC'a
-        /*sub1.description = "Загрузить в машину";
+        System.out.println("Обновление EPIC'a");
+        sub1.description = "Загрузить в машину";
         manager.updateTask(sub1);
         System.out.println(manager.getAll());
         System.out.println("-----------------------------------------------------------");
@@ -59,6 +54,24 @@ public class Main {
         System.out.println("-----------------------------------------------------------");
         sub2.description = "Кошка села за руль и уехала";
         manager.updateTask(sub2);
-        System.out.println(manager.getAll());*/
+        System.out.println(manager.getAll());
+        System.out.println("Удалим задачу у эпика по id: " + 4);
+        manager.delById(4);
+        System.out.println(manager.getAll());
+        System.out.println();
+
+        System.out.println("Удаление задачи по id: " + 1 + ". Также проверим несуществующий id: " + 32);
+        manager.delById(32);
+        manager.delById(1);
+        System.out.println(manager.getAll());
+        System.out.println();
+
+        System.out.println("Очистка трекера задач");
+        manager.delAll();
+        System.out.println(manager.getAll());
     }
 }
+/*Семён, привет! Спасибо за замечания, в целом всё подправил. Комментарии, где просил, я оставил:).
+Добавил enum. В целом прикольная штука, чтобы никто не мог вместо данных трёх статусов задач закинуть что-то ещё.
+Либо же, если нужно будет добавить какой-нибудь новый статус, я просто в enum его закидываю и дальше могу использовать,
+вместо того, чтобы переписывать часть программы. Удобно!:)*/

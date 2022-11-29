@@ -19,15 +19,15 @@ public class Epic extends Task {
     public void updateStatus() {
         boolean flag = true;
         for(SubTask sub : subTaskList.values()) {
-            if(sub.getStatus() != "DONE") {
+            if(!sub.getStatus().equals(TaskStatus.DONE.toString())) {
                 flag = false;
             }
-            if(sub.getStatus() == "IN_PROGRESS") {
-                this.status = "IN_PROGRESS";
+            if(sub.getStatus().equals(TaskStatus.IN_PROGRESS.toString())) {
+                this.setStatus(TaskStatus.IN_PROGRESS.toString());
                 flag = false;
                 break;
             }
         }
-        if (flag == true) this.status = "DONE";
+        if (flag) this.setStatus(TaskStatus.DONE.toString());
     }
 }

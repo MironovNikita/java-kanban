@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class Manager {
     HashMap<Integer, Task> taskList;
@@ -15,12 +14,12 @@ public class Manager {
         System.out.println("Трекер задач: ");
         System.out.println();
         for (Task task : taskList.values()) {
-            info.append("TASK: " + task.getInfo() + "\n");
+            info.append("TASK: ").append(task.getInfo()).append("\n");
         }
         for (Epic task : epicList.values()) {
-            info.append("EPIC: " + task.getInfo() + "\n");
+            info.append("EPIC: ").append(task.getInfo()).append("\n");
             for (SubTask sub : task.getAllSubTask().values()) {
-                info.append("- sub: " + sub.getInfo() + "\n");
+                info.append("- sub: ").append(sub.getInfo()).append("\n");
             }
         }
         return info.toString();
@@ -65,21 +64,23 @@ public class Manager {
 
     public void create (Task task) {
         if(task instanceof Epic) {
-            epicList.put(task.id, (Epic)task);
+            epicList.put(task.getId(), (Epic)task);
         }
         else if (task instanceof Task) {
-            taskList.put(task.id, task);
+            taskList.put(task.getId(), task);
         }
     }
     public void updateTask (Task task) {
         int id = task.getId();
         taskList.get(id).name = task.name;
         taskList.get(id).description = task.description;
-        if(taskList.get(id).status == "NEW") taskList.get(id).status = "IN_PROGRESS";
-        else if(taskList.get(id).status == "IN_PROGRESS") taskList.get(id).status = "DONE";
-        else {
-            System.out.println("Эта задача уже была завершена");
+        if(taskList.get(id).getStatus().equals(TaskStatus.NEW.toString())) {
+            taskList.get(id).setStatus(TaskStatus.IN_PROGRESS.toString());
         }
+        else if(taskList.get(id).getStatus().equals(TaskStatus.IN_PROGRESS.toString())) {
+            taskList.get(id).setStatus(TaskStatus.DONE.toString());
+        }
+        else System.out.println("Эта задача уже была завершена");
     }
 
     public void updateTask (SubTask sub) {
@@ -90,8 +91,12 @@ public class Manager {
                     int epicId = task.getId();
                     subj.name = sub.name;
                     subj.description = sub.description;
-                    if(subj.status == "NEW") subj.status = "IN_PROGRESS";
-                    else if(subj.status == "IN_PROGRESS") subj.status = "DONE";
+                    if(subj.getStatus().equals(TaskStatus.NEW.toString())) {
+                        subj.setStatus(TaskStatus.IN_PROGRESS.toString());
+                    }
+                    else if(subj.getStatus().equals(TaskStatus.IN_PROGRESS.toString())) {
+                        subj.setStatus(TaskStatus.DONE.toString());
+                    }
                     epicList.get(epicId).updateStatus();
                 }
             }

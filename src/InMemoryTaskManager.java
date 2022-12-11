@@ -1,14 +1,20 @@
 import java.util.HashMap;
 
-public class Manager {
-    HashMap<Integer, Task> taskList;
-    HashMap<Integer, Epic> epicList;
+public class InMemoryTaskManager implements TaskManager {
+    public HashMap<Integer, Task> taskList;
+    public HashMap<Integer, Epic> epicList;
+    public HistoryManager watchHistory = Managers.getDefaultHistory();
 
-    public Manager() {
+    public InMemoryTaskManager() {
         taskList = new HashMap<>();
         epicList = new HashMap<>();
     }
 
+    @Override
+    public HistoryManager getHistory() {
+        return watchHistory;
+    }
+    @Override
     public String getAll() {
         StringBuilder info = new StringBuilder();
         System.out.println("Трекер задач: ");
@@ -24,7 +30,7 @@ public class Manager {
         }
         return info.toString();
     }
-
+    @Override
     public void delAll() {
         boolean taskEmpty = taskList.isEmpty();
         boolean epicEmpty = epicList.isEmpty();
@@ -47,21 +53,32 @@ public class Manager {
         }
     }
 
+
+    @Override
     public Task getById(int id) {
         boolean taskKey = taskList.containsKey(id);
         boolean epicKey = epicList.containsKey(id);
-        if(taskKey) return taskList.get(id);
-        if(epicKey) return epicList.get(id);
+        if(taskKey) {
+            watchHistory.addToHistory(taskList.get(id));
+            return taskList.get(id);
+        }
+        if(epicKey) {
+            watchHistory.addToHistory(epicList.get(id));
+            return epicList.get(id);
+        }
         else {
             for (Epic task : epicList.values()) {
                 for (SubTask sub : task.getAllSubTask().values()) {
-                    if(sub.getId() == id) return sub;
+                    if(sub.getId() == id) {
+                        watchHistory.addToHistory(sub);
+                        return sub;
+                    }
                 }
             }
         }
         return null;
     }
-
+    @Override
     public void create (Task task) {
         if(task instanceof Epic) {
             epicList.put(task.getId(), (Epic)task);
@@ -70,6 +87,8 @@ public class Manager {
             taskList.put(task.getId(), task);
         }
     }
+
+    @Override
     public void updateTask (Task task) {
         int id = task.getId();
         taskList.get(id).name = task.name;
@@ -83,6 +102,7 @@ public class Manager {
         else System.out.println("Эта задача уже была завершена");
     }
 
+    @Override
     public void updateTask (SubTask sub) {
         int id = sub.getId();
         for (Epic task : epicList.values()) {
@@ -103,6 +123,7 @@ public class Manager {
         }
     }
 
+    @Override
     public void delById(int id) {
         boolean taskKey = taskList.containsKey(id);
         boolean epicKey = epicList.containsKey(id);
@@ -127,6 +148,7 @@ public class Manager {
         System.out.println("Задачи с таким ID (" + id + ") нет в Трекере!");
     }
 
+    @Override
     public HashMap<Integer, SubTask> getSubTaskList(Epic epic) {
         return epic.subTaskList;
     }

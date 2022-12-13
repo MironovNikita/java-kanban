@@ -1,3 +1,6 @@
+package workWithTasks;
+
+import tasks.Task;
 import java.util.ArrayDeque;
 
 public class InMemoryHistoryManager implements HistoryManager {

@@ -1,9 +1,16 @@
+package workWithTasks;
+
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
+import tasks.TaskStatus;
+
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    public HashMap<Integer, Task> taskList;
-    public HashMap<Integer, Epic> epicList;
-    public HistoryManager watchHistory = Managers.getDefaultHistory();
+    protected HashMap<Integer, Task> taskList;
+    protected HashMap<Integer, Epic> epicList;
+    protected HistoryManager watchHistory = Managers.getDefaultHistory();
 
     public InMemoryTaskManager() {
         taskList = new HashMap<>();
@@ -14,6 +21,7 @@ public class InMemoryTaskManager implements TaskManager {
     public HistoryManager getHistory() {
         return watchHistory;
     }
+
     @Override
     public String getAll() {
         StringBuilder info = new StringBuilder();
@@ -30,6 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return info.toString();
     }
+
     @Override
     public void delAll() {
         boolean taskEmpty = taskList.isEmpty();
@@ -52,7 +61,6 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Список эпиков пуст!");
         }
     }
-
 
     @Override
     public Task getById(int id) {
@@ -78,6 +86,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return null;
     }
+
     @Override
     public void create (Task task) {
         if(task instanceof Epic) {
@@ -91,8 +100,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask (Task task) {
         int id = task.getId();
-        taskList.get(id).name = task.name;
-        taskList.get(id).description = task.description;
+        taskList.get(id).setName(task.getName());
+        taskList.get(id).setDescription(task.getDescription());
         if(taskList.get(id).getStatus().equals(TaskStatus.NEW.toString())) {
             taskList.get(id).setStatus(TaskStatus.IN_PROGRESS.toString());
         }
@@ -109,8 +118,8 @@ public class InMemoryTaskManager implements TaskManager {
             for (SubTask subj : task.getAllSubTask().values()) {
                 if(subj.getId() == id) {
                     int epicId = task.getId();
-                    subj.name = sub.name;
-                    subj.description = sub.description;
+                    subj.setName(sub.getName());
+                    subj.setDescription(sub.getDescription());
                     if(subj.getStatus().equals(TaskStatus.NEW.toString())) {
                         subj.setStatus(TaskStatus.IN_PROGRESS.toString());
                     }
@@ -139,7 +148,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Epic task : epicList.values()) {
                 for (SubTask sub : task.getAllSubTask().values()) {
                     if(sub.getId() == id) {
-                        task.subTaskList.remove(id);
+                        task.getSubTaskList().remove(id);
                         return;
                     }
                 }
@@ -150,6 +159,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public HashMap<Integer, SubTask> getSubTaskList(Epic epic) {
-        return epic.subTaskList;
+        return epic.getSubTaskList();
     }
 }

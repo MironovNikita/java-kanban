@@ -1,3 +1,5 @@
+package tasks;
+
 public class Task {
     static int uniqId = 1;
 
@@ -15,6 +17,22 @@ public class Task {
 
     public String getInfo() {
         return id + ")" + " " + name + " " + "(" + description + ")" + " " + status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getStatus() {

@@ -1,11 +1,17 @@
+package tasks;
+
 import java.util.HashMap;
 
 public class Epic extends Task {
-    HashMap<Integer, SubTask> subTaskList;
+    protected HashMap<Integer, SubTask> subTaskList;
 
     public Epic(String name, String description) {
         super(name, description);
         subTaskList = new HashMap<>();
+    }
+
+    public HashMap<Integer, SubTask> getSubTaskList() {
+        return subTaskList;
     }
 
     public void createSubTask(SubTask sub) {

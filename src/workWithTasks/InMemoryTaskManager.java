@@ -8,14 +8,9 @@ import tasks.TaskStatus;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected HashMap<Integer, Task> taskList;
-    protected HashMap<Integer, Epic> epicList;
-    protected HistoryManager watchHistory = Managers.getDefaultHistory();
-
-    public InMemoryTaskManager() {
-        taskList = new HashMap<>();
-        epicList = new HashMap<>();
-    }
+    private final HashMap<Integer, Task> taskList = new HashMap<>();
+    private final HashMap<Integer, Epic> epicList = new HashMap<>();
+    private final HistoryManager watchHistory = Managers.getDefaultHistory();
 
     @Override
     public HistoryManager getHistory() {

@@ -14,6 +14,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void addToHistory(Task task) {
+        if(task == null) {
+            System.out.println("В историю просмотра задач нельзя добавить пустой объект!");
+            return;
+        }
         if(history.size() > historySize) {
             history.removeFirst();
         }

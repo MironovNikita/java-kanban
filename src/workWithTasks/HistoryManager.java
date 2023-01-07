@@ -1,9 +1,11 @@
 package workWithTasks;
 
 import tasks.Task;
-import java.util.ArrayDeque;
+
+import java.util.List;
 
 interface HistoryManager {
-    ArrayDeque<Task> getHistory();
+    List<Task> getHistory();
     void addToHistory(Task task);
+    void remove(int id);
 }

@@ -44,12 +44,21 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if(!taskEmpty) {
+            for (Task task : taskList.values()) {
+                watchHistory.remove(task.getId());
+            }
             taskList.clear();
             System.out.println("Список задач очищен!");
         } else {
             System.out.println("Список задач пуст!");
         }
         if(!epicEmpty) {
+            for (Epic task : epicList.values()) {
+                for (SubTask sub : task.getAllSubTask().values()) {
+                    watchHistory.remove(sub.getId());
+                }
+                watchHistory.remove(task.getId());
+            }
             epicList.clear();
             System.out.println("Список эпиков очищен!");
         } else {
@@ -65,7 +74,7 @@ public class InMemoryTaskManager implements TaskManager {
             watchHistory.addToHistory(taskList.get(id));
             return taskList.get(id);
         }
-        if(epicKey) {
+        else if(epicKey) {
             watchHistory.addToHistory(epicList.get(id));
             return epicList.get(id);
         }
@@ -133,10 +142,16 @@ public class InMemoryTaskManager implements TaskManager {
         boolean epicKey = epicList.containsKey(id);
         if(taskKey) {
             taskList.remove(id);
+            watchHistory.remove(id);
             return;
         }
-        if(epicKey) {
+        else if(epicKey) {
+            for (SubTask sub : epicList.get(id).getAllSubTask().values()) {
+                watchHistory.remove(sub.getId());
+            }
+            epicList.get(id).getSubTaskList().clear();
             epicList.remove(id);
+            watchHistory.remove(id);
             return;
         }
         else {
@@ -144,6 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
                 for (SubTask sub : task.getAllSubTask().values()) {
                     if(sub.getId() == id) {
                         task.getSubTaskList().remove(id);
+                        watchHistory.remove(id);
                         return;
                     }
                 }

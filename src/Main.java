@@ -24,8 +24,6 @@ public class Main {
         inMemoryTaskManager.create(task2);
         System.out.println(inMemoryTaskManager.getAll());
 
-
-
         System.out.println("Получение списка всех подзадач определённого эпика: " + 2);
         System.out.println(inMemoryTaskManager.getSubTaskList(epic2));
         System.out.println();
@@ -97,4 +95,6 @@ public class Main {
         System.out.println(inMemoryTaskManager.getAll());
         System.out.println(inMemoryTaskManager.getHistory());
     }
+    /* Семён, привет! Оставил ответы на комментарии в коде
+    */
 }

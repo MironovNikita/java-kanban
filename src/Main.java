@@ -95,6 +95,4 @@ public class Main {
         System.out.println(inMemoryTaskManager.getAll());
         System.out.println(inMemoryTaskManager.getHistory());
     }
-    /* Семён, привет! Оставил ответы на комментарии в коде
-    */
 }

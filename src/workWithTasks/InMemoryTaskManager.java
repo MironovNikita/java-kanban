@@ -12,6 +12,14 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Epic> epicList = new HashMap<>();
     private final HistoryManager watchHistory = Managers.getDefaultHistory();
 
+    public HashMap<Integer, Task> getTaskList() {
+        return taskList;
+    }
+
+    public HashMap<Integer, Epic> getEpicList() {
+        return epicList;
+    }
+
     @Override
     public HistoryManager getHistory() {
         return watchHistory;

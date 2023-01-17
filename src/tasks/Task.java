@@ -43,6 +43,11 @@ public class Task {
         return id;
     }
 
+    //Метод добавлен для установки id у задачи при чтении из файла
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setStatus(String status) {
         if (status.equals(TaskStatus.DONE.toString())
                 || status.equals(TaskStatus.NEW.toString())

@@ -16,9 +16,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private static final String FILE_HEADER = "id,type,name,status,description,epic";
     private static final File fileHistory = new File ("history.csv");
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
 
-        FileBackedTasksManager fileManager = new FileBackedTasksManager();
+        TaskManager fileManager = Managers.getDefault();
 
         Task task1 = new Task("Почистить зубы", "Тщательно");
         Task task2 = new Task("Побриться", "Основательно");
@@ -80,11 +80,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println("Восстановленная история менеджера из файла:");
         System.out.println(fileManagerRead.getHistory());
 
-        /*Семён, привет! Я закомментировал часть кода с удалениями и изменениями, чтобы у тебя создался файл, который
-        удобно было проверять. Далее можно всё раскомментировать и увидеть, что программа работает, а файл будто бы
-        и не создаётся в папке проекта :)
-        P.S. Некоторым ребятам приходят замечания, что метод "main" нужно делать в отдельном классе. Но у нас по ТЗ
-        указано, что его надо сделать в классе FileBackedTasksManager. Но если что, пиши, создадим отдельный класс :)*/
+        /*Семён, привет! Я оставил ответы в коде на тех местах, где были вопросы, а также поменял немного программу в
+        соответствии с рекомендациями.
+        Буду ждать результатов!*/
 
         /*System.out.println("Проверка работы менеджера из файла:");
         System.out.println(fileManagerRead.getById(8));
@@ -154,7 +152,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return super.getEpicList();
     }
 
-    public void save() throws ManagerSaveException {
+    /* По поводу throws. Я, кажется, понял, для чего оно указывается. Когда сдавал на ревью это ТЗ в первый раз, я
+    думал, что throws указывается в том методе, где оно обрабатывается и может произойти. Сейчас понял, что throws мы
+    указываем, когда исключение проверяемое. В нашем случае - непроверяемое. Соответственно и здесь у save(), и далее
+    у loadFromFile(File file) я убрал throws из сигнатур методов.*/
+    public void save() {
         try(OutputStreamWriter historyFile = new OutputStreamWriter(new FileOutputStream(fileHistory),
                 Charset.forName("windows-1251"))) {
             historyFile.write(FILE_HEADER + "\n");
@@ -174,7 +176,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             historyFile.write("\n");
             historyFile.write(historyToString(Managers.getDefaultHistory()));
         } catch (IOException exception) {
+            System.out.println("Информация об ошибке:");
+            exception.printStackTrace();
             throw new ManagerSaveException("Ошибка записи файла!");
+
         }
     }
 
@@ -194,8 +199,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 type = TaskTypes.EPIC.toString();
             }
             else type = TaskTypes.TASK.toString();
-            return task.getId()+","+type+","+task.getName()+","+task.getStatus()+","+task.getDescription()+","+
-                    epicId + "\n";
+            /*Да, ты прав. Лучше будет применять StringBuilder. Так будет работать быстрее.
+            При чём я посмотрел на код свежим взглядом и увидел, что ранее я в том же historyToString применял его...
+            Вот, что значит делать ТЗ за несколько дней. Даже мыслишь по-разному...*/
+            StringBuilder toStr = new StringBuilder();
+            toStr.append(task.getId()).append(",").append(type).append(",").append(task.getName()).append(",")
+                    .append(task.getStatus()).append(",").append(task.getDescription()).append(",")
+                    .append(epicId).append("\n");
+            return toStr.toString();
         }
     }
 
@@ -246,8 +257,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    static FileBackedTasksManager loadFromFile(File file) throws FileNotFoundException {
-        FileBackedTasksManager loadManagerFromFile = new FileBackedTasksManager();
+    //Добавил модификатор final, чтобы объект нельзя было перезаписать
+    static FileBackedTasksManager loadFromFile(File file) {
+        final FileBackedTasksManager loadManagerFromFile = new FileBackedTasksManager();
         try (BufferedReader bufReader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                 "windows-1251"))) {
             String line;
@@ -302,9 +314,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     }
                 }
             }
-        } catch (IOException e) {
-            throw new FileNotFoundException("Ошибка чтения файла! Проверьте его наличие по указанному пути!");
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            throw new ManagerSaveException("Ошибка чтения файла! Проверьте его наличие по указанному пути!");
         }
         return loadManagerFromFile;
     }
+    /* Здесь кидал FileNotFoundException, т.к. подумал, что ManagerSaveException мы пишем для метода сохранения save().
+    Но после замечания понял, что ManagerSaveException нужно наследовать от RuntimeException, и всё встало на свои
+    места.*/
 }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private static final HashMap<Integer, Node<Task>> historyList = new HashMap<>();
-    private static final CustomLinkedList customLinkedList = new CustomLinkedList();
+    private final CustomLinkedList customLinkedList = new CustomLinkedList();
 
     @Override
     public List<Task> getHistory() {
@@ -53,7 +53,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         return "История просмотров:\n" + getHistory();
     }
 
-    static class CustomLinkedList extends LinkedList<Task> {
+    class CustomLinkedList extends LinkedList<Task> {
         private Node<Task> head = null;
         private Node<Task> tail = null;
         private int size = 0;
@@ -62,8 +62,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             final Node<Task> last = tail;
             final Node<Task> newNode = new Node<>(last, task, null);
             tail = newNode;
-            if (last == null)
-                head = newNode;
+            if (last == null || head == null) head = newNode;
             else
                 last.setNext(newNode);
             size++;
@@ -83,5 +82,4 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 }
-
 

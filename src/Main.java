@@ -4,19 +4,27 @@ import tasks.Task;
 import workWithTasks.Managers;
 import workWithTasks.TaskManager;
 
+import java.time.LocalDateTime;
+
 public class Main {
     public static void main(String[] args) {
         TaskManager inMemoryTaskManager = Managers.getDefault();
-        Task task1 = new Task("Почистить зубы", "Тщательно");
-        Task task2 = new Task("Побриться", "Основательно");
-        Epic epic1 = new Epic("Переезд", "В новый дом");
-        SubTask sub1 = new SubTask("Собрать все коробки", "Да, да... Все коробочки!");
-        SubTask sub2 = new SubTask("Упаковать кошку", "Прощай, кошка!");
-        SubTask sub3 = new SubTask("Сделать домашнее задание", "До воскресенья");
+        Task task1 = new Task("Почистить зубы", "Тщательно",5);
+        Task task2 = new Task("Побриться", "Основательно",10,
+                LocalDateTime.of(2023,1,1,9,0));
+        Epic epic1 = new Epic("Переезд", "В новый дом",0);
+        SubTask sub1 = new SubTask("Собрать все коробки", "Да, да... Все коробочки!",60,
+                LocalDateTime.of(2023,1,1,10,0));
+        SubTask sub2 = new SubTask("Упаковать кошку", "Прощаемся с кошкой!",10,
+                LocalDateTime.of(2023,1,1,11,0));
+        SubTask sub3 = new SubTask("Сделать домашнее задание", "До воскресенья",1000);
         epic1.createSubTask(sub1);
         epic1.createSubTask(sub2);
         epic1.createSubTask(sub3);
-        Epic epic2 = new Epic("Учёба", "Изучаем JAVA");
+        Epic epic2 = new Epic("Учёба", "Изучаем JAVA",0);
+        SubTask sub4 = new SubTask("Порадоваться выполненному заданию", "Но ждать замечаний :)",
+                1000, LocalDateTime.of(2023, 1,10,10,0));
+        epic2.createSubTask(sub4);
 
         inMemoryTaskManager.create(epic1);
         inMemoryTaskManager.create(epic2);
@@ -24,8 +32,8 @@ public class Main {
         inMemoryTaskManager.create(task2);
         System.out.println(inMemoryTaskManager.getAll());
 
-        System.out.println("Получение списка всех подзадач определённого эпика: " + 2);
-        System.out.println(inMemoryTaskManager.getSubTaskList(epic2));
+        System.out.println("Получение списка всех подзадач определённого эпика: " + 1);
+        System.out.println(inMemoryTaskManager.getSubTaskList(epic1));
         System.out.println();
 
         System.out.println("Обновление задачи TASK");
@@ -74,6 +82,9 @@ public class Main {
         System.out.println(inMemoryTaskManager.getById(3));
         System.out.println(inMemoryTaskManager.getHistory());
         System.out.println();
+
+        System.out.println("Получение задач в порядке приоритета:");
+        System.out.println(inMemoryTaskManager.getPrioritizedTasks());
 
         System.out.println(inMemoryTaskManager.getAll());
         System.out.println("История просмотров до удаления: ");

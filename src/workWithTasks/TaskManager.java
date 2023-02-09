@@ -5,6 +5,7 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.util.HashMap;
+import java.util.TreeSet;
 
 public interface TaskManager {
     String getAll();
@@ -16,4 +17,5 @@ public interface TaskManager {
     void delById(int id);
     HashMap<Integer, SubTask> getSubTaskList(Epic epic);
     HistoryManager getHistory();
+    TreeSet<Task> getPrioritizedTasks();
 }

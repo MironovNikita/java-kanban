@@ -1,11 +1,9 @@
 package workWithTasks;
 
-import tasks.Epic;
-import tasks.SubTask;
-import tasks.Task;
-import tasks.TaskStatus;
+import tasks.*;
 
 import java.util.HashMap;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskList = new HashMap<>();
@@ -99,36 +97,94 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
+    public static boolean shouldNotBeAdded(Task task, Task verifyTask) {
+        boolean isVerifiedByTime = false;
+        if(task.getEndTime().isAfter(verifyTask.getStartTime())
+                && task.getStartTime().isBefore(verifyTask.getStartTime())
+                || task.getStartTime().isBefore(verifyTask.getStartTime())
+                && task.getEndTime().isAfter(verifyTask.getEndTime())
+                || task.getStartTime().isBefore(verifyTask.getEndTime())
+                && task.getEndTime().isAfter(verifyTask.getEndTime())
+                || task.getStartTime().isAfter(verifyTask.getStartTime())
+                && task.getEndTime().isBefore(verifyTask.getEndTime())
+                || task.getStartTime().isEqual(verifyTask.getStartTime())) {
+            isVerifiedByTime = true;
+        }
+        return isVerifiedByTime;
+    }
+
     @Override
     public void create (Task task) {
-        if(task instanceof Epic) {
-            epicList.put(task.getId(), (Epic)task);
-        }
-        else if (task instanceof Task) {
-            taskList.put(task.getId(), task);
+        if(task.getStartTime() == null) {
+            if(task instanceof Epic) {
+                epicList.put(task.getId(), (Epic)task);
+                ((Epic) task).setInManager(true);
+            }
+            else if (task instanceof Task) {
+                taskList.put(task.getId(), task);
+            }
+        } else {
+            boolean isNotCrossAllTasks = true;
+            for(Task verifyTask : taskList.values()) {
+                if(verifyTask.getStartTime() != null) {
+                    if (!verifyTask.getStatus().equals(TaskStatus.DONE.toString())) {
+                        if(shouldNotBeAdded(task, verifyTask)) {
+                            isNotCrossAllTasks = false;
+                            System.out.println("Задача " + task.getInfo()
+                                    + " не была добавлена, так как её время пересекается с текущими задачами");
+                            break;
+                        } else continue;
+                    } else continue;
+                }
+            }
+            for(Epic verifyEpic : epicList.values()) {
+                if(verifyEpic.getStartTime() != null) {
+                    if (!verifyEpic.getStatus().equals(TaskStatus.DONE.toString())) {
+                        if(shouldNotBeAdded(task, verifyEpic)) {
+                            isNotCrossAllTasks = false;
+                            System.out.println("Задача " + task.getInfo()
+                                    + " не была добавлена, так как её время пересекается с текущими задачами");
+                            break;
+                        } else continue;
+                    } else continue;
+                }
+            }
+            if(isNotCrossAllTasks) {
+                if(task instanceof Epic) {
+                    epicList.put(task.getId(), (Epic)task);
+                    ((Epic) task).setInManager(true);
+                }
+                else if (task instanceof Task) {
+                    taskList.put(task.getId(), task);
+                }
+            }
         }
     }
 
     @Override
     public void updateTask (Task task) {
-        int id = task.getId();
-        taskList.get(id).setName(task.getName());
-        taskList.get(id).setDescription(task.getDescription());
-        if(taskList.get(id).getStatus().equals(TaskStatus.NEW.toString())) {
-            taskList.get(id).setStatus(TaskStatus.IN_PROGRESS.toString());
+        if(taskList.containsKey(task.getId())) {
+            int id = task.getId();
+            taskList.get(id).setName(task.getName());
+            taskList.get(id).setDescription(task.getDescription());
+            if (taskList.get(id).getStatus().equals(TaskStatus.NEW.toString())) {
+                taskList.get(id).setStatus(TaskStatus.IN_PROGRESS.toString());
+            } else if (taskList.get(id).getStatus().equals(TaskStatus.IN_PROGRESS.toString())) {
+                taskList.get(id).setStatus(TaskStatus.DONE.toString());
+            } else System.out.println("Эта задача уже была завершена");
+        } else {
+            System.out.println("Такой задачи не существует!");
         }
-        else if(taskList.get(id).getStatus().equals(TaskStatus.IN_PROGRESS.toString())) {
-            taskList.get(id).setStatus(TaskStatus.DONE.toString());
-        }
-        else System.out.println("Эта задача уже была завершена");
     }
 
     @Override
     public void updateTask (SubTask sub) {
         int id = sub.getId();
+        boolean exist = false;
         for (Epic task : epicList.values()) {
             for (SubTask subj : task.getAllSubTask().values()) {
                 if(subj.getId() == id) {
+                    exist = true;
                     int epicId = task.getId();
                     subj.setName(sub.getName());
                     subj.setDescription(sub.getDescription());
@@ -142,6 +198,7 @@ public class InMemoryTaskManager implements TaskManager {
                 }
             }
         }
+        if(!exist) System.out.println("Такой задачи не существует!");
     }
 
     @Override
@@ -178,6 +235,26 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public HashMap<Integer, SubTask> getSubTaskList(Epic epic) {
-        return epic.getSubTaskList();
+        if(epicList.containsValue(epic)) {
+            return epic.getSubTaskList();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public TreeSet<Task> getPrioritizedTasks() {
+        TaskStartTimeComparator comparator = new TaskStartTimeComparator();
+        TreeSet<Task> setByStartTime = new TreeSet<>(comparator);
+        if(!taskList.isEmpty()) {
+            setByStartTime.addAll(taskList.values());
+        }
+        if(!epicList.isEmpty()) {
+            setByStartTime.addAll(epicList.values());
+            for(Epic epic : epicList.values()) {
+                setByStartTime.addAll(epic.getAllSubTask().values());
+            }
+        }
+        return setByStartTime;
     }
 }

@@ -1,8 +1,13 @@
 package tasks;
 
-public class SubTask extends Task {
+import java.time.LocalDateTime;
 
-    public SubTask(String name, String description) {
-        super(name, description);
+public class SubTask extends Task {
+    public SubTask(String name, String description, int duration) {
+        super(name, description, duration);
+    }
+
+    public SubTask(String name, String description, int duration, LocalDateTime startTime) {
+        super(name, description, duration, startTime);
     }
 }

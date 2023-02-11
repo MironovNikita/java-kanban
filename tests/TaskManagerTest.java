@@ -3,7 +3,6 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 import workWithTasks.*;
-import tasks.Task.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -302,8 +301,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         manager.create(epic);
 
         StringBuilder stringCheck = new StringBuilder();
-        stringCheck.append("[").append(subTask2.getInfo()).append("\n, ").append(epic.getInfo()).append("\n, ")
-                .append(subTask1.getInfo())
+        stringCheck.append("[").append(subTask2.getInfo()).append("\n, ").append(subTask1.getInfo())
                         .append("\n, ").append(task1.getInfo()).append("\n, ").append(task2.getInfo()).append("\n]");
 
         Assertions.assertEquals(stringCheck.toString(), manager.getPrioritizedTasks().toString());

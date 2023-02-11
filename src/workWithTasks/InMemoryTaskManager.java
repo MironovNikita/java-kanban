@@ -250,7 +250,7 @@ public class InMemoryTaskManager implements TaskManager {
             setByStartTime.addAll(taskList.values());
         }
         if(!epicList.isEmpty()) {
-            setByStartTime.addAll(epicList.values());
+            //Удалил добавление эпиков
             for(Epic epic : epicList.values()) {
                 setByStartTime.addAll(epic.getAllSubTask().values());
             }

@@ -15,20 +15,27 @@ public class Task {
 
     protected LocalDateTime startTime;
 
+    /*Конструктор забыл раскомментировать =) Когда тестировал программу, закомментировал и потом забыл
+    раскомментировать*/
     //Конструктор без обработки времени
-    /*public Task(String name, String description) {
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.duration = 0;
         id = uniqId;
         uniqId++;
-    }*/
+    }
 
+    /*Здесь по этому конструктору и следующему:
+    Логика такая: если кто-то вдруг случайно укажет или duration, или startTime при создании эпика, конструктор
+    автоматически присвоит такие поля, какие нужно и рассчитает правильно и его продолжительность, и время начала, и
+    время конца соответственно (3 конструктор). Т.е. таким образом я предупреждаю ошибку - программа будет работать
+    верно даже если объект эпика будет неверно создан (с продолжительностью и с/без времени начала).*/
     //Конструктор только с продолжительностью (если не задано время начала задачи)
     public Task(String name, String description, int duration) {
         this.name = name;
         this.description = description;
-        if(this instanceof Epic) duration = 0;
+        if(this instanceof Epic) this.duration = 0;
         else this.duration = duration;
         id = uniqId;
         uniqId++;
@@ -38,8 +45,13 @@ public class Task {
     public Task(String name, String description, int duration, LocalDateTime startTime) {
         this.name = name;
         this.description = description;
-        this.duration = duration;
-        this.startTime = startTime;
+        if(this instanceof Epic) {
+            this.duration = 0;
+            this.startTime = null;
+        } else {
+            this.duration = duration;
+            this.startTime = startTime;
+        }
         id = uniqId;
         uniqId++;
     }

@@ -6,7 +6,6 @@ import tasks.Task;
 import tasks.TaskTypes;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,6 +18,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private static final File fileHistory = new File ("history.csv");
 
     public static void main(String[] args) {
+
+        /*Семён, привет! Спасибо за ревью!
+        Оставил в коде ответы, где были вопросы (по большей части - конструктор Task).
+        Раскомментировал код, добавил второй вызов порядка приоритета менеджера, восстановленного из файла,
+        всё совпадает :)
+        Также удалил добавление эпиков, не до конца понял ТЗ. Пункт начинается с "Отсортируйте все задачи...", это меня
+        и смутило, хотя по логике верно - эпика тут быть не должно
+        Касаемо неточности согласен! Я когда делал ТЗ, думал, что уже всё готово и увидел, что у меня один из эпиков
+        продолжительностью всего 3 минуты (делал для тестирования), начинается, условно 1-го января, а заканчивается
+        20-го января. Т.е. по факту за 20 дней я потрачу всего 3 минуты :D И я прогонял методы через debug - всё уже
+        к тому моменту было верно, не мог понять, почему getEndTime() так работает... А потом до меня дошло, что
+        берётся самое позднее время из всех подзадач... Попался на этом, в общем. В целом тяжёленькое ТЗ вышло.
+
+        Насчёт записи файла спасибо за помощь! Я более менее разобрался, в чём нюансы записи/чтения. Насчёт FileReader
+        и FileWriter ты прав - данные классы используют символьный поток, поэтому они хороши для обработки текстовых
+        файлов и используют системную кодировку по умолчанию. А BufferedReader и BufferedWriter позволяют ускорить
+        чтение/запись файла и в целом работу программы за счёт того, что сначала заполняется буфер, а затем он
+        записывается в файл целиком, а не посимвольно
+        Понял, что перемудрил в прошлый раз. Я как раз шёл по пути байтового потока. И, видимо, из-за этого на твоём
+        ноутбуке всё возвращалось кракозябрами.*/
 
         TaskManager fileManager = Managers.getDefault();
 
@@ -82,15 +101,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println("Вывод задач в порядке приоритета:");
         System.out.println(fileManager.getPrioritizedTasks());
 
-        /*System.out.println("Менеджер, созданный из файла:");
+        System.out.println("Менеджер, созданный из файла:");
         FileBackedTasksManager fileManagerRead = loadFromFile(fileHistory);
         System.out.println(fileManagerRead.getAll());
         System.out.println("Восстановленная история менеджера из файла:");
         System.out.println(fileManagerRead.getHistory());
 
-        /*Семён, привет! Я оставил ответы в коде на тех местах, где были вопросы, а также поменял немного программу в
-        соответствии с рекомендациями.
-        Буду ждать результатов!*/
+        System.out.println();
+        System.out.println("Вывод задач в порядке приоритета у менеджера, восстановленного из файла:");
+        System.out.println(fileManagerRead.getPrioritizedTasks());
 
         /*System.out.println("Проверка работы менеджера из файла:");
         System.out.println(fileManagerRead.getById(8));
@@ -166,8 +185,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public void save() {
-        try(OutputStreamWriter historyFile = new OutputStreamWriter(new FileOutputStream(fileHistory),
-                Charset.forName("windows-1251"))) {
+        try(BufferedWriter historyFile = new BufferedWriter(new FileWriter(fileHistory))) {
             historyFile.write(FILE_HEADER + "\n");
             if(!getTaskList().isEmpty()) {
                 for(Task task : getTaskList().values()) {
@@ -284,8 +302,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     //Добавил модификатор final, чтобы объект нельзя было перезаписать
     public static FileBackedTasksManager loadFromFile(File file) {
         final FileBackedTasksManager loadManagerFromFile = new FileBackedTasksManager();
-        try (BufferedReader bufReader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                "windows-1251"))) {
+        try (BufferedReader bufReader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = bufReader.readLine()) != null) {
                 if(line.equals(FILE_HEADER)) {

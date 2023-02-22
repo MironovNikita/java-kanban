@@ -178,7 +178,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         int epicSubtaskListSizeBeforeAdding = epic.getSubTaskList().size();
         epic.createSubTask(subTask);
         int epicSubtaskListSizeAfterAdding = epic.getSubTaskList().size();
-        Assertions.assertEquals("", manager.getAll(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getEpicList().isEmpty(), "Список эпиков не пуст!");
+        Assertions.assertTrue(manager.getSubTaskList().isEmpty(), "Список подзадач не пуст!");
         Assertions.assertEquals(epicSubtaskListSizeBeforeAdding + 1, epicSubtaskListSizeAfterAdding,
                 "Подзадача не добавляется в EPIC!");
     }

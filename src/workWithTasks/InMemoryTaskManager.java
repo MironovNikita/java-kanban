@@ -8,14 +8,21 @@ import java.util.TreeSet;
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskList = new HashMap<>();
     private final HashMap<Integer, Epic> epicList = new HashMap<>();
+    private final HashMap<Integer, SubTask> subTaskList = new HashMap<>();
     private final HistoryManager watchHistory = Managers.getDefaultHistory();
 
+    @Override
     public HashMap<Integer, Task> getTaskList() {
         return taskList;
     }
 
+    @Override
     public HashMap<Integer, Epic> getEpicList() {
         return epicList;
+    }
+    @Override
+    public HashMap<Integer, SubTask> getSubTaskList() {
+        return subTaskList;
     }
 
     @Override
@@ -24,28 +31,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public String getAll() {
-        StringBuilder info = new StringBuilder();
-        System.out.println("Трекер задач: ");
-        System.out.println();
-        for (Task task : taskList.values()) {
-            info.append("TASK: ").append(task.getInfo()).append("\n");
-        }
-        for (Epic task : epicList.values()) {
-            info.append("EPIC: ").append(task.getInfo()).append("\n");
-            for (SubTask sub : task.getAllSubTask().values()) {
-                info.append("- sub: ").append(sub.getInfo()).append("\n");
-            }
-        }
-        return info.toString();
-    }
-
-    @Override
     public void delAll() {
         boolean taskEmpty = taskList.isEmpty();
         boolean epicEmpty = epicList.isEmpty();
+        boolean subTaskEmpty = subTaskList.isEmpty();
 
-        if(taskEmpty && epicEmpty) {
+        if(taskEmpty && epicEmpty && subTaskEmpty) {
             System.out.println("Нет задач для удаления! Трекер задач пуст!");
             return;
         }
@@ -69,6 +60,12 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Список эпиков очищен!");
         } else {
             System.out.println("Список эпиков пуст!");
+        }
+        if(!subTaskEmpty) {
+            subTaskList.clear();
+            System.out.println("Список подзадач очищен!");
+        } else {
+            System.out.println("Список подзадач пуст!");
         }
     }
 
@@ -118,11 +115,15 @@ public class InMemoryTaskManager implements TaskManager {
         if(task.getStartTime() == null) {
             if(task instanceof Epic) {
                 epicList.put(task.getId(), (Epic)task);
-                ((Epic) task).setInManager(true);
             }
-            else if (task instanceof Task) {
-                taskList.put(task.getId(), task);
-            }
+            else if (task instanceof SubTask) {
+                if(!epicList.isEmpty()) {
+                    if(epicList.containsKey(((SubTask) task).getEpicId())) {
+                        epicList.get(((SubTask) task).getEpicId()).createSubTask((SubTask) task);
+                        subTaskList.put(task.getId(), (SubTask) task);
+                    }
+                }
+            } else taskList.put(task.getId(), task);
         } else {
             boolean isNotCrossAllTasks = true;
             for(Task verifyTask : taskList.values()) {
@@ -149,14 +150,32 @@ public class InMemoryTaskManager implements TaskManager {
                     } else continue;
                 }
             }
+            for(SubTask verifyTask : subTaskList.values()) {
+                if(verifyTask.getStartTime() != null) {
+                    if (!verifyTask.getStatus().equals(TaskStatus.DONE.toString())) {
+                        if(task.getId() != verifyTask.getEpicId()) {
+                            if(shouldNotBeAdded(task, verifyTask)) {
+                                isNotCrossAllTasks = false;
+                                System.out.println("Подзадача " + task.getInfo()
+                                        + " не была добавлена, так как её время пересекается с текущими задачами");
+                                break;
+                            } else continue;
+                        }
+                    } else continue;
+                }
+            }
             if(isNotCrossAllTasks) {
                 if(task instanceof Epic) {
                     epicList.put(task.getId(), (Epic)task);
-                    ((Epic) task).setInManager(true);
                 }
-                else if (task instanceof Task) {
-                    taskList.put(task.getId(), task);
-                }
+                else if (task instanceof SubTask) {
+                    if(!epicList.isEmpty()) {
+                        if(epicList.containsKey(((SubTask) task).getEpicId())) {
+                            epicList.get(((SubTask) task).getEpicId()).createSubTask((SubTask) task);
+                            subTaskList.put(task.getId(), (SubTask) task);
+                        }
+                    }
+                } else taskList.put(task.getId(), task);
             }
         }
     }
@@ -223,6 +242,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Epic task : epicList.values()) {
                 for (SubTask sub : task.getAllSubTask().values()) {
                     if(sub.getId() == id) {
+                        subTaskList.remove(sub.getId());
                         task.getSubTaskList().remove(id);
                         watchHistory.remove(id);
                         return;

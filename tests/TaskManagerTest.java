@@ -17,31 +17,19 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Task.setUniqId(1);
     }
 
-    @DisplayName("Возвращение списка всех задач")
-    @Test
-    void shouldReturnFullTaskList() {
-        Task task = new Task("Task", "Description of task", 10);
-        Epic epic = new Epic("Epic", "Description of epic", 10);
-        SubTask subTask = new SubTask("SubTask", "Description of subTask", 10);
-        epic.createSubTask(subTask);
-        manager.create(task);
-        manager.create(epic);
-        String fullTaskList = "TASK: " + task.getInfo() + "\n" +
-                "EPIC: " + epic.getInfo() + "\n" +
-                "- sub: " + subTask.getInfo() + "\n";
-
-        Assertions.assertEquals(fullTaskList, manager.getAll(), "Списки задач не совпадают!");
-    }
-
     @DisplayName("Удаление всех задач из менеджера")
     @Test
     void shouldDeleteAllTasksFromManager() {
         Task task = new Task("Task", "Description of task", 10);
         Epic epic = new Epic("Epic", "Description of epic", 10);
+        SubTask subTask = new SubTask("SubTask", "Description of subtask", 0);
         manager.create(task);
         manager.create(epic);
+        epic.createSubTask(subTask);
         manager.delAll();
-        Assertions.assertEquals("", manager.getAll(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getTaskList().isEmpty(), "Список задач не пуст");
+        Assertions.assertTrue(manager.getEpicList().isEmpty(), "Список эпиков не пуст");
+        Assertions.assertTrue(manager.getSubTaskList().isEmpty(), "Список подзадач не пуст");
     }
 
     @DisplayName("Возвращение задачи по ID")
@@ -152,7 +140,9 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @DisplayName("Проверка пустого списка задач")
     @Test
     void shouldVerifyIfTaskManagerListIsEmpty() {
-        Assertions.assertTrue(manager.getAll().isEmpty(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getTaskList().isEmpty(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getEpicList().isEmpty(), "Список эпиков не пуст!");
+        Assertions.assertTrue(manager.getSubTaskList().isEmpty(), "Список подзадач не пуст!");
     }
 
     @DisplayName("Проверка удаления всех задач из менеджера")
@@ -162,9 +152,11 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Epic epic = new Epic("Epic", "Description of epic", 5);
         manager.create(task);
         manager.create(epic);
-        Assertions.assertFalse(manager.getAll().isEmpty(), "Список задач пуст!");
+        Assertions.assertFalse(manager.getEpicList().isEmpty(), "Список эпиков пуст!");
+        Assertions.assertFalse(manager.getTaskList().isEmpty(), "Список задач пуст!");
         manager.delAll();
-        Assertions.assertTrue(manager.getAll().isEmpty(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getTaskList().isEmpty(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getEpicList().isEmpty(), "Список эпиков не пуст!");
     }
 
     @DisplayName("Проверка получения задачи из пустого менеджера")

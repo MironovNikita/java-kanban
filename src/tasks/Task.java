@@ -9,16 +9,18 @@ public class Task {
 
     private int id;
     private String status = TaskStatus.NEW.toString();
+
+    private String type;
     protected String name;
     protected String description;
-    protected int duration;//(в минутах)
+    private long duration;//(в минутах)
+    private LocalDateTime startTime;
 
-    protected LocalDateTime startTime;
-
-    /*Конструктор забыл раскомментировать =) Когда тестировал программу, закомментировал и потом забыл
-    раскомментировать*/
     //Конструктор без обработки времени
     public Task(String name, String description) {
+        if(this instanceof SubTask) this.type = TaskTypes.SUBTASK.toString();
+        else if (this instanceof Epic) this.type = TaskTypes.EPIC.toString();
+        else this.type = TaskTypes.TASK.toString();
         this.name = name;
         this.description = description;
         this.duration = 0;
@@ -26,13 +28,11 @@ public class Task {
         uniqId++;
     }
 
-    /*Здесь по этому конструктору и следующему:
-    Логика такая: если кто-то вдруг случайно укажет или duration, или startTime при создании эпика, конструктор
-    автоматически присвоит такие поля, какие нужно и рассчитает правильно и его продолжительность, и время начала, и
-    время конца соответственно (3 конструктор). Т.е. таким образом я предупреждаю ошибку - программа будет работать
-    верно даже если объект эпика будет неверно создан (с продолжительностью и с/без времени начала).*/
     //Конструктор только с продолжительностью (если не задано время начала задачи)
     public Task(String name, String description, int duration) {
+        if(this instanceof SubTask) this.type = TaskTypes.SUBTASK.toString();
+        else if (this instanceof Epic) this.type = TaskTypes.EPIC.toString();
+        else this.type = TaskTypes.TASK.toString();
         this.name = name;
         this.description = description;
         if(this instanceof Epic) this.duration = 0;
@@ -43,6 +43,9 @@ public class Task {
 
     //Конструктор с полным набором полей времени
     public Task(String name, String description, int duration, LocalDateTime startTime) {
+        if(this instanceof SubTask) this.type = TaskTypes.SUBTASK.toString();
+        else if (this instanceof Epic) this.type = TaskTypes.EPIC.toString();
+        else this.type = TaskTypes.TASK.toString();
         this.name = name;
         this.description = description;
         if(this instanceof Epic) {
@@ -56,11 +59,19 @@ public class Task {
         uniqId++;
     }
 
-    public void setDuration(int duration) {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
@@ -81,18 +92,22 @@ public class Task {
         uniqId = id;
     }
 
+    public static int getUniqId() {
+        return uniqId;
+    }
+
     public String getInfo() {
         String startOf = "";
         String endOf = "";
         if(startTime != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[dd.MM.yyyy - HH:mm]");
             startOf = startTime.format(formatter);
-            /*if(this.getEndTime() != null)*/ endOf = this.getEndTime().format(formatter);
+            endOf = this.getEndTime().format(formatter);
         }
         StringBuilder taskInfo = new StringBuilder();
-        taskInfo.append(id).append(") ").append(name).append(" (").append(description).append(") ").append(status)
-                .append(" |Начало: ").append(startOf).append("| |Продолжительность: ").append(duration)
-                .append(" мин.|").append(" |Конец: ").append(endOf).append("|");
+        taskInfo.append(id).append(") ").append(type).append(": ").append(name).append(" (").append(description)
+                .append(") ").append(status).append(" |Начало: ").append(startOf).append("| |Продолжительность: ")
+                .append(duration).append(" мин.|").append(" |Конец: ").append(endOf).append("|");
         return taskInfo.toString();
     }
 
@@ -143,9 +158,9 @@ public class Task {
             endOf = this.getEndTime().format(formatter);
         }
         StringBuilder taskInfo = new StringBuilder();
-        taskInfo.append(id).append(") ").append(name).append(" (").append(description).append(") ").append(status)
-                .append(" |Начало: ").append(startOf).append("| |Продолжительность: ").append(duration)
-                .append(" мин.|").append(" |Конец: ").append(endOf).append("|").append("\n");
+        taskInfo.append(id).append(") ").append(type).append(": ").append(name).append(" (").append(description)
+                .append(") ").append(status).append(" |Начало: ").append(startOf).append("| |Продолжительность: ")
+                .append(duration).append(" мин.|").append(" |Конец: ").append(endOf).append("|").append("\n");
         return taskInfo.toString();
     }
 
@@ -154,13 +169,14 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && duration == task.duration && Objects.equals(status, task.status)
-                && Objects.equals(name, task.name) && Objects.equals(description, task.description)
+        return id == task.id && duration == task.duration && Objects.equals(type, task.type)
+                && Objects.equals(status, task.status) && Objects.equals(name, task.name)
+                && Objects.equals(description, task.description)
                 && Objects.equals(startTime, task.startTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, status, name, description, duration, startTime) + 31;
+        return Objects.hash(id, status, type, name, description, duration, startTime) + 31;
     }
 }

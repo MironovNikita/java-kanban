@@ -30,7 +30,12 @@ public class Main {
         inMemoryTaskManager.create(epic2);
         inMemoryTaskManager.create(task1);
         inMemoryTaskManager.create(task2);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
 
         System.out.println("Получение списка всех подзадач определённого эпика: " + 1);
         System.out.println(inMemoryTaskManager.getSubTaskList(epic1));
@@ -39,32 +44,67 @@ public class Main {
         System.out.println("Обновление задачи TASK");
         task1.setDescription("Помыть щётку");
         inMemoryTaskManager.updateTask(task1);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         task1.setDescription("Убрать щётку");
         task2.setDescription("Помыть бритву");
         inMemoryTaskManager.updateTask(task1);
         inMemoryTaskManager.updateTask(task2);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         inMemoryTaskManager.updateTask(task2);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println();
 
         System.out.println("Обновление EPIC'а");
         sub1.setDescription("Загрузить в машину");
         inMemoryTaskManager.updateTask(sub1);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println("-----------------------------------------------------------");
         sub2.setDescription("Кошка в клетке");
         inMemoryTaskManager.updateTask(sub2);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println("-----------------------------------------------------------");
         sub1.setDescription("Найти водителя");
         inMemoryTaskManager.updateTask(sub1);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println("-----------------------------------------------------------");
         sub2.setDescription("Кошка села за руль и уехала");
         inMemoryTaskManager.updateTask(sub2);
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println();
 
         System.out.println("Получение задачи по id: ");
@@ -86,7 +126,12 @@ public class Main {
         System.out.println("Получение задач в порядке приоритета:");
         System.out.println(inMemoryTaskManager.getPrioritizedTasks());
 
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println("История просмотров до удаления: ");
         System.out.println(inMemoryTaskManager.getHistory());
         System.out.println("Удаление задачи по id: " + 3 + " и " + 1 + ". Также проверим несуществующий id: " + 32);
@@ -98,12 +143,22 @@ public class Main {
         System.out.println("История просмотров после удаления задачи по id " + 1 + ":");
         System.out.println(inMemoryTaskManager.getHistory());
 
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println();
 
         System.out.println("Очистка трекера задач");
         inMemoryTaskManager.delAll();
-        System.out.println(inMemoryTaskManager.getAll());
+        System.out.println("Список задач:");
+        System.out.println(inMemoryTaskManager.getTaskList());
+        System.out.println("Список подзадач:");
+        System.out.println(inMemoryTaskManager.getSubTaskList());
+        System.out.println("Список эпиков:");
+        System.out.println(inMemoryTaskManager.getEpicList());
         System.out.println(inMemoryTaskManager.getHistory());
     }
 }

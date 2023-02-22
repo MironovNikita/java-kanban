@@ -34,8 +34,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         Assertions.assertEquals(expectedTaskHashMap, manager.getTaskList(), "Списки задач не совпадают!");
     }
 
-    //@DisplayName()
-
     @DisplayName("Возвращение списка EPIC'ов менеджера")
     @Test
     void shouldReturnRightManagerEpicList() {
@@ -253,7 +251,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         int epicSubtaskListSizeBeforeAdding = epic.getSubTaskList().size();
         epic.createSubTask(subTask);
         int epicSubtaskListSizeAfterAdding = epic.getSubTaskList().size();
-        Assertions.assertEquals("", manager.getAll(), "Список задач не пуст!");
+        Assertions.assertTrue(manager.getEpicList().isEmpty(), "Список эпиков не пуст!");
+        Assertions.assertTrue(manager.getSubTaskList().isEmpty(), "Список подзадач не пуст!");
         Assertions.assertEquals(epicSubtaskListSizeBeforeAdding + 1, epicSubtaskListSizeAfterAdding,
                 "Подзадача не добавляется в EPIC!");
     }
@@ -266,7 +265,12 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         File file = new File("history.csv");
         FileBackedTasksManager managerToVerify = FileBackedTasksManager.loadFromFile(file);
 
-        Assertions.assertEquals(manager.getAll(), managerToVerify.getAll(), "Списки задач не совпадают!");
+        Assertions.assertEquals(manager.getTaskList(), managerToVerify.getTaskList()
+                ,"Списки задач не совпадают!");
+        Assertions.assertEquals(manager.getEpicList(), managerToVerify.getEpicList(),
+                "Списки эпиков не совпадают!");
+        Assertions.assertEquals(manager.getSubTaskList(), managerToVerify.getSubTaskList(),
+                "Списки подзадач не совпадают!");
     }
 
     @DisplayName("Проверка сохранения и восстановления состояния при EPIC'е без подзадач")
@@ -287,7 +291,12 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         File file = new File("history.csv");
         FileBackedTasksManager managerToVerify = FileBackedTasksManager.loadFromFile(file);
 
-        Assertions.assertEquals(manager.getAll(), managerToVerify.getAll(), "Списки задач не совпадают!");
+        Assertions.assertEquals(manager.getTaskList(), managerToVerify.getTaskList()
+                ,"Списки задач не совпадают!");
+        Assertions.assertEquals(manager.getEpicList(), managerToVerify.getEpicList(),
+                "Списки эпиков не совпадают!");
+        Assertions.assertEquals(manager.getSubTaskList(), managerToVerify.getSubTaskList(),
+                "Списки подзадач не совпадают!");
     }
 
     @DisplayName("Проверка сохранения и восстановления состояния при пустом списке истории")
@@ -310,6 +319,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         File file = new File("history.csv");
         FileBackedTasksManager managerToVerify = FileBackedTasksManager.loadFromFile(file);
 
-        Assertions.assertEquals(manager.getAll(), managerToVerify.getAll(), "Списки задач не совпадают!");
+        Assertions.assertEquals(manager.getTaskList(), managerToVerify.getTaskList()
+                ,"Списки задач не совпадают!");
+        Assertions.assertEquals(manager.getEpicList(), managerToVerify.getEpicList(),
+                "Списки эпиков не совпадают!");
+        Assertions.assertEquals(manager.getSubTaskList(), managerToVerify.getSubTaskList(),
+                "Списки подзадач не совпадают!");
     }
 }

@@ -9,7 +9,10 @@ public class Epic extends Task {
     private final HashMap<Integer, SubTask> subTaskList;
     private LocalDateTime endTime;
 
-    private boolean isInManager = false;
+    public Epic(String name, String description) {
+        super(name, description);
+        subTaskList = new HashMap<>();
+    }
 
     public Epic(String name, String description, int duration) {
         super(name, description, duration);
@@ -20,9 +23,6 @@ public class Epic extends Task {
         return subTaskList;
     }
 
-    public void setInManager(boolean inManager) {
-        isInManager = inManager;
-    }
 
     @Override
     public LocalDateTime getEndTime() {
@@ -31,7 +31,7 @@ public class Epic extends Task {
 
     //При добавлении подзадачи должен происходить расчёт его продолжительности и времени начала/конца эпика
     public void createSubTask(SubTask sub) {
-        if(!isInManager) {
+
             if (sub.getStartTime() != null) {
                 boolean isAdded = true;
                 for(SubTask subTask : subTaskList.values()) {
@@ -48,24 +48,25 @@ public class Epic extends Task {
                     }
                 }
                 if(isAdded) {
-                    duration += sub.getDuration();
+                    this.setDuration(this.getDuration() + sub.getDuration());
                     if (subTaskList.isEmpty()) {
-                        startTime = sub.getStartTime();
+                        this.setStartTime(sub.getStartTime());;
                         endTime = sub.getEndTime();
-                    } else if (startTime.isAfter(sub.getStartTime())) {
-                        startTime = sub.getStartTime();
+                    } else if (this.getStartTime().isAfter(sub.getStartTime())) {
+                        this.setStartTime(sub.getStartTime());;
                     } else if (endTime.isBefore(sub.getEndTime())) {
                         endTime = sub.getEndTime();
                     }
                     subTaskList.put(sub.getId(), sub);
+                    sub.setEpicId(this.getId());
                 }
             } else {
-                duration += sub.getDuration();
+                this.setDuration(this.getDuration() + sub.getDuration());
                 subTaskList.put(sub.getId(), sub);
+                sub.setEpicId(this.getId());
             }
-        } else System.out.println("Текущую подзадачу " + sub.getInfo()
-                + " нельзя добавить в EPIC " + this.getId() + ", так как он уже добавлен в менеджер.");
-    }
+        }
+
 
     public HashMap<Integer, SubTask> getAllSubTask() {
         return subTaskList;

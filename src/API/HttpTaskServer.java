@@ -35,35 +35,6 @@ public class HttpTaskServer {
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 
-    //Задачи для проверки через Insomnia
-    /*{
-        Task task1 = new Task("Почистить зубы", "Тщательно",5);
-        Task task2 = new Task("Побриться", "Основательно",120,
-                LocalDateTime.of(2023,1,2,12,0));
-        Epic epic1 = new Epic("Переезд", "В новый дом",0);
-        SubTask sub1 = new SubTask("Собрать все коробки", "Да, да... Все коробочки!",180,
-                LocalDateTime.of(2023,1,1,10,0));
-        SubTask sub2 = new SubTask("Упаковать кошку", "Прощаемся с кошкой!",10,
-                LocalDateTime.of(2023,1,2,12,0));
-        SubTask sub3 = new SubTask("Сделать домашнее задание", "До воскресенья",1);
-
-        Epic epic2 = new Epic("Учёба", "Изучаем JAVA",0);
-        SubTask sub4 = new SubTask("Порадоваться выполненному заданию", "Но ждать замечаний :)",
-                10, LocalDateTime.of(2023, 3,10,10,0));
-        manager.create(task1);
-        manager.create(task2);
-        manager.create(sub1);
-        manager.create(sub2);
-        manager.create(sub3);
-        manager.create(sub4);
-        epic1.createSubTask(sub1);
-        epic1.createSubTask(sub3);
-        epic2.createSubTask(sub4);
-        manager.create(epic1);
-        manager.create(epic2);
-        epic1.createSubTask(sub2);
-    }*/
-
     public HttpTaskServer() throws IOException {
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);

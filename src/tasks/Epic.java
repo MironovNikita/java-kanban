@@ -23,7 +23,6 @@ public class Epic extends Task {
         return subTaskList;
     }
 
-
     @Override
     public LocalDateTime getEndTime() {
         return endTime;
@@ -50,10 +49,10 @@ public class Epic extends Task {
                 if(isAdded) {
                     this.setDuration(this.getDuration() + sub.getDuration());
                     if (subTaskList.isEmpty()) {
-                        this.setStartTime(sub.getStartTime());;
+                        this.setStartTime(sub.getStartTime());
                         endTime = sub.getEndTime();
                     } else if (this.getStartTime().isAfter(sub.getStartTime())) {
-                        this.setStartTime(sub.getStartTime());;
+                        this.setStartTime(sub.getStartTime());
                     } else if (endTime.isBefore(sub.getEndTime())) {
                         endTime = sub.getEndTime();
                     }
@@ -66,7 +65,6 @@ public class Epic extends Task {
                 sub.setEpicId(this.getId());
             }
         }
-
 
     public HashMap<Integer, SubTask> getAllSubTask() {
         return subTaskList;

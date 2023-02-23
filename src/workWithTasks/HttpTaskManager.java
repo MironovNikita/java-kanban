@@ -1,15 +1,30 @@
 package workWithTasks;
 
+import API.LocalDateTimeAdapter;
 import KV_Server.KVTaskClient;
+import com.google.gson.*;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTasksManager {
     private String url;
     KVTaskClient client;
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .serializeNulls()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .create();
+    public String Tasks = "Tasks";
+    public String Epics = "Epics";
+    public String Subtasks = "Subtasks";
+    public String History = "History";
+
     public HttpTaskManager (String url) {
         this.url = url;
         client = new KVTaskClient(url);
@@ -17,84 +32,58 @@ public class HttpTaskManager extends FileBackedTasksManager {
 
     @Override
     public void save() {
-        StringBuilder data = new StringBuilder();
-        if(!getTaskList().isEmpty()) {
-            for(Task task : getTaskList().values()) {
-                data.append(toString(task));
-            }
-        }
-        if(!getEpicList().isEmpty()) {
-            for (Epic task : getEpicList().values()) {
-                data.append(toString(task));
-                for (SubTask sub : task.getAllSubTask().values()) {
-                    data.append((toString(sub)));
-                }
-            }
-        }
-        if(!getSubTaskList().isEmpty()) {
-            for (SubTask subTask : getSubTaskList().values()) {
-                data.append(toString(subTask));
-            }
-        }
-        data.append("\n");
-        data.append(historyToString(getHistory()));
-        client.put("httpManager", data.toString());
+        List<Task> taskListToSave = new ArrayList<>();
+        getTaskList().values().stream().collect(Collectors.toCollection(() -> taskListToSave));
+        String taskListToJson = gson.toJson(taskListToSave);
+
+        List<Epic> epicListToSave = new ArrayList<>();
+        getEpicList().values().stream().collect(Collectors.toCollection(()->epicListToSave));
+        String epicListToJson = gson.toJson(epicListToSave);
+
+        List<SubTask> subTaskListToSave = new ArrayList<>();
+        getSubTaskList().values().stream().collect(Collectors.toCollection(()->subTaskListToSave));
+        String subTaskListToJson = gson.toJson(subTaskListToSave);
+
+        List<Task> historyToSave = new ArrayList<>(getHistory().getHistory());
+        String historyToJson = gson.toJson(historyToSave);
+
+        client.put(Tasks, taskListToJson);
+        client.put(Epics, epicListToJson);
+        client.put(Subtasks, subTaskListToJson);
+        client.put(History, historyToJson);
     }
 
     public HttpTaskManager load(){
-        int taskQuantity = 0;
         final HttpTaskManager httpManager = new HttpTaskManager(url);
-        String[] lines = client.load("httpManager").split("\n");
-        if(lines.length == 0) return httpManager;
-        for(String str : lines) {
-            if(str.equals("")) {
-                break;
-            }
-            Task task = httpManager.fromString(str);
-            taskQuantity++;
-            if(Task.getUniqId() < task.getId()) Task.setUniqId(task.getId() + 1);
-            if(task instanceof Epic) {
-                httpManager.getEpicList().put(task.getId(), (Epic)task);
-                task.setDuration(0);
-            } else if(task instanceof SubTask && !httpManager.getEpicList().isEmpty()) {
-                int whatEpic = Integer.parseInt(str.substring(str.length() - 1));
-                for(Epic epic : httpManager.getEpicList().values()) {
-                    if(whatEpic == epic.getId()) {
-                        epic.createSubTask((SubTask)task);
-                        ((SubTask) task).setEpicId(epic.getId());
-                        break;
-                    }
-                }
-            } else {
-                httpManager.getTaskList().put(task.getId(), task);
-            }
+        JsonElement jsonElementOfTasks = JsonParser.parseString(client.load(Tasks));
+        JsonArray jsonOfTasks = jsonElementOfTasks.getAsJsonArray();
+        for (int i = 0; i < jsonOfTasks.size(); i++) {
+            Task task = gson.fromJson(jsonOfTasks.get(i), Task.class);
+            httpManager.getTaskList().put(task.getId(), task);
         }
-        if(lines.length == taskQuantity) {
-            return httpManager;
+        JsonElement jsonElementOfEpics = JsonParser.parseString(client.load(Epics));
+        JsonArray jsonOfEpics = jsonElementOfEpics.getAsJsonArray();
+        for(int i = 0; i < jsonOfEpics.size(); i++) {
+            Epic epic = gson.fromJson(jsonOfEpics.get(i), Epic.class);
+            httpManager.getEpicList().put(epic.getId(), epic);
         }
-        String history = lines[lines.length - 1];
-        List<Integer> histFromNumbs = historyFromString(history);
-        for(Integer value : histFromNumbs) {
-                    /*Если под этим Id - Task, добавляем в историю
-                      Иначе если под этим Id - Epic, добавляем в историю
-                      Иначе пробегаемся по всем спискам subTask'ов Epic'ов и добавляем sub в историю*/
-            if(httpManager.getTaskList().containsKey(value)) {
-                httpManager.getHistory().addToHistory(httpManager.getTaskList().get(value));
-            } else if (httpManager.getEpicList().containsKey(value)) {
-                httpManager.getHistory().addToHistory(httpManager.getEpicList().get(value));
-            } else {
-                boolean isAdded = false;
-                for (Epic epic : httpManager.getEpicList().values()) {
-                    if(!isAdded) {
-                        for (SubTask sub : epic.getAllSubTask().values()) {
-                            if(sub.getId().equals(value)) {
-                                httpManager.getHistory().addToHistory(sub);
-                                isAdded = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+        JsonElement jsonElementOfSubTasks = JsonParser.parseString(client.load(Subtasks));
+        JsonArray jsonOfSubTasks = jsonElementOfSubTasks.getAsJsonArray();
+        for(int i = 0; i < jsonOfSubTasks.size(); i++) {
+            SubTask subTask = gson.fromJson(jsonOfSubTasks.get(i), SubTask.class);
+            httpManager.getSubTaskList().put(subTask.getId(), subTask);
+        }
+
+        JsonElement jsonElementOfHistory = JsonParser.parseString(client.load(History));
+        JsonArray jsonOfHistory = jsonElementOfHistory.getAsJsonArray();
+        for(int i = 0; i < jsonOfHistory.size(); i++) {
+            Task task = gson.fromJson(jsonOfHistory.get(i), Task.class);
+            if(httpManager.getTaskList().containsKey(task.getId())) {
+                httpManager.getHistory().addToHistory(httpManager.getTaskList().get(task.getId()));
+            } else if(httpManager.getEpicList().containsKey(task.getId())) {
+                httpManager.getHistory().addToHistory(httpManager.getEpicList().get(task.getId()));
+            } else if (httpManager.getSubTaskList().containsKey(task.getId())) {
+                httpManager.getHistory().addToHistory(httpManager.getSubTaskList().get(task.getId()));
             }
         }
         return httpManager;
